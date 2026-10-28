@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="A production-quality, responsive Web Development and JavaScript Quiz App built with vanilla HTML5, CSS3, and modern JavaScript.">
+  <title>Frontend &amp; JavaScript Mastery Quiz</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Header with app brand, live score, and theme toggle -->
+  <header class="app-header">
+    <div class="header-container">
+      <div class="brand">
+        <span class="brand-icon" aria-hidden="true">⚡</span>
+        <span class="brand-name">DevQuiz</span>
+      </div>
+
+      <div class="header-actions">
+        <!-- Live score displayed only during active quiz -->
+        <div id="liveScoreContainer" class="live-score" hidden aria-live="polite">
+          <span class="live-score-label">Score:</span>
+          <span id="liveScoreValue" class="live-score-value">0</span>
+        </div>
+
+        <!-- High score display -->
+        <div class="high-score-badge" title="Highest score achieved on this device">
+          <span class="trophy-icon" aria-hidden="true">🏆</span>
+          <span class="badge-label">Best:</span>
+          <span id="headerHighScore" class="badge-value">0 / 10</span>
+        </div>
+
+        <!-- Dark/Light mode toggle -->
+        <button id="themeToggleBtn" type="button" class="theme-toggle-btn" aria-label="Switch to dark mode" title="Toggle color theme">
+          <span id="themeIcon" aria-hidden="true">🌙</span>
+          <span id="themeLabel" class="theme-label">Dark</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Card Container -->
+  <main class="app-container">
+    <article class="quiz-card" id="quizCard">
+
+      <!-- ==================== 1. START SCREEN ==================== -->
+      <section id="startScreen" class="screen start-screen" aria-labelledby="startTitle">
+        <div class="start-header">
+          <div class="quiz-badge">Interactive Challenge</div>
+          <h1 id="startTitle" class="screen-title">Web Development &amp; JavaScript Quiz</h1>
+          <p class="screen-desc">
+            Test your knowledge of modern JavaScript, HTML5, CSS3, and core browser concepts with 10 randomly shuffled questions.
+          </p>
+        </div>
+
+        <div class="rules-grid">
+          <div class="rule-card">
+            <span class="rule-icon" aria-hidden="true">📋</span>
+            <div class="rule-content">
+              <strong>10 Questions</strong>
+              <span>Curated Web Dev &amp; JS topics</span>
+            </div>
+          </div>
+          <div class="rule-card">
+            <span class="rule-icon" aria-hidden="true">⏱️</span>
+            <div class="rule-content">
+              <strong>15s Per Question</strong>
+              <span>Timer resets on each question</span>
+            </div>
+          </div>
+          <div class="rule-card">
+            <span class="rule-icon" aria-hidden="true">🎯</span>
+            <div class="rule-content">
+              <strong>Instant Feedback</strong>
+              <span>Review answers immediately</span>
+            </div>
+          </div>
+          <div class="rule-card">
+            <span class="rule-icon" aria-hidden="true">⌨️</span>
+            <div class="rule-content">
+              <strong>Keyboard Friendly</strong>
+              <span>Keys 1–4 to answer, Enter to advance</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="start-stats">
+          <span class="stats-label">Current High Score:</span>
+          <strong id="startHighScore" class="stats-value">0 / 10</strong>
+        </div>
+
+        <div class="actions-group">
+          <button id="startBtn" type="button" class="btn btn-primary btn-large">
+            <span>Start Quiz</span>
+            <span class="btn-arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ==================== 2. QUESTION SCREEN ==================== -->
+      <section id="quizScreen" class="screen quiz-screen" aria-labelledby="questionText" hidden>
+        <!-- Quiz progress bar -->
+        <div class="progress-bar-container" role="progressbar" id="quizProgressBar" aria-label="Quiz progress" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+          <div id="quizProgressFill" class="progress-bar-fill"></div>
+        </div>
+
+        <!-- Question header: counter & countdown timer -->
+        <div class="quiz-meta">
+          <span id="questionCounter" class="question-counter">Question 1 of 10</span>
+
+          <div id="timerContainer" class="timer-container" aria-live="polite" aria-atomic="true">
+            <span class="timer-icon" aria-hidden="true">⏳</span>
+            <span id="timerText" class="timer-text">15s</span>
+          </div>
+        </div>
+
+        <!-- Timer progress bar track and shrinking fill -->
+        <div class="timer-bar-track" aria-hidden="true">
+          <div id="timerBarFill" class="timer-bar-fill"></div>
+        </div>
+
+        <!-- Question content block with animation -->
+        <div id="questionContainer" class="question-container">
+          <h2 id="questionText" class="question-text">Question text will load here...</h2>
+
+          <!-- Options container: buttons injected via script.js -->
+          <div id="optionsContainer" class="options-container" role="group" aria-label="Answer options">
+            <!-- 4 Option buttons rendered dynamically via event delegation -->
+          </div>
+
+          <!-- Instant visual feedback message -->
+          <div id="feedbackText" class="feedback-text" role="status" aria-live="polite" aria-atomic="true"></div>
+        </div>
+
+        <!-- Navigation: Next button appears after answer / timeout -->
+        <div class="navigation-group">
+          <button id="nextBtn" type="button" class="btn btn-primary" hidden>
+            <span id="nextBtnText">Next</span>
+            <span class="btn-arrow" aria-hidden="true">→</span>
+          </button>
+        </div>
+      </section>
+
+      <!-- ==================== 3. RESULT SCREEN ==================== -->
+      <section id="resultScreen" class="screen result-screen" aria-labelledby="resultTitle" hidden>
+        <div class="result-header">
+          <div id="resultBadge" class="result-badge">Completed!</div>
+          <h2 id="resultTitle" class="screen-title">Quiz Results</h2>
+          <p id="performanceMessage" class="performance-message">Great effort!</p>
+        </div>
+
+        <!-- Circular Score Visualization -->
+        <div class="score-visual-wrapper">
+          <div class="score-ring-container">
+            <svg class="score-ring-svg" viewBox="0 0 120 120" aria-hidden="true">
+              <circle class="score-ring-bg" cx="60" cy="60" r="50"></circle>
+              <circle id="scoreRingFg" class="score-ring-fg" cx="60" cy="60" r="50"></circle>
+            </svg>
+            <div class="score-ring-center">
+              <span id="scorePercentage" class="score-percentage">0%</span>
+              <span class="score-subtext">Accuracy</span>
+            </div>
+          </div>
+
+          <div class="result-score-details">
+            <div class="score-total">
+              <span class="score-number" id="finalScoreText">0 / 10</span>
+              <span class="score-label">Final Score</span>
+            </div>
+            <div id="resultHighScoreNotice" class="high-score-notice">
+              <!-- Dynamically populated: e.g. "🏆 New High Score!" or "Personal Best: 9 / 10" -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Score Breakdown Stats -->
+        <div class="breakdown-grid">
+          <div class="breakdown-card correct">
+            <span class="breakdown-icon" aria-hidden="true">✓</span>
+            <div class="breakdown-info">
+              <span class="breakdown-value" id="statCorrect">0</span>
+              <span class="breakdown-label">Correct</span>
+            </div>
+          </div>
+          <div class="breakdown-card wrong">
+            <span class="breakdown-icon" aria-hidden="true">✗</span>
+            <div class="breakdown-info">
+              <span class="breakdown-value" id="statWrong">0</span>
+              <span class="breakdown-label">Wrong</span>
+            </div>
+          </div>
+          <div class="breakdown-card unanswered">
+            <span class="breakdown-icon" aria-hidden="true">⏱</span>
+            <div class="breakdown-info">
+              <span class="breakdown-value" id="statUnanswered">0</span>
+              <span class="breakdown-label">Timed Out</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Result Action Buttons -->
+        <div class="actions-group">
+          <button id="restartBtn" type="button" class="btn btn-primary">
+            <span aria-hidden="true">🔄</span>
+            <span>Restart Quiz</span>
+          </button>
+          <button id="reviewBtn" type="button" class="btn btn-secondary" aria-expanded="false" aria-controls="reviewContainer">
+            <span aria-hidden="true">📝</span>
+            <span id="reviewBtnText">Review Answers</span>
+          </button>
+        </div>
+
+        <!-- Detailed Review Section (Collapsible) -->
+        <div id="reviewContainer" class="review-container" hidden>
+          <h3 class="review-heading">Question-by-Question Review</h3>
+          <ul id="reviewList" class="review-list">
+            <!-- Injected via script.js -->
+          </ul>
+        </div>
+      </section>
+
+    </article>
+  </main>
+
+  <!-- Footer -->
+  <footer class="app-footer">
+    <p>DevQuiz &bull; Vanilla HTML5, CSS3 &amp; JavaScript ES6+ &bull; Production Ready</p>
+  </footer>
+
+  <script src="script.js" defer></script>
+</body>
+</html>
